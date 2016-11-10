@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -63,6 +62,7 @@ public class ServerService extends Service {
 
     static int deviceWidth;
     static int deviceHeight;
+    static int dpi;
     Point resolution = new Point();
 
     private static boolean LOCAL_DEBUG = false;
@@ -100,6 +100,7 @@ public class ServerService extends Service {
             mDisplay.getMetrics(dm);
             deviceWidth = dm.widthPixels;
             deviceHeight = dm.heightPixels;
+            dpi = dm.densityDpi;
             float resolutionRatio = Float.parseFloat(
                     preferences.getString(SettingsActivity.KEY_RESOLUTION_PREF, "0.25"));
             mDisplay.getRealSize(resolution);
@@ -225,13 +226,13 @@ public class ServerService extends Service {
             e.printStackTrace();
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            virtualDisplay = mDisplayManager.createVirtualDisplay("Remote Droid", CodecUtils.WIDTH, CodecUtils.HEIGHT, 50,
+            virtualDisplay = mDisplayManager.createVirtualDisplay("Remote Droid", CodecUtils.WIDTH, CodecUtils.HEIGHT, dpi,
                     encoderInputSurface,
                     DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC | DisplayManager.VIRTUAL_DISPLAY_FLAG_SECURE);
         } else {
             if (MainActivity.mMediaProjection != null) {
                 virtualDisplay = MainActivity.mMediaProjection.createVirtualDisplay("Remote Droid",
-                        CodecUtils.WIDTH, CodecUtils.HEIGHT, 50,
+                        CodecUtils.WIDTH, CodecUtils.HEIGHT, dpi,
                         DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                         encoderInputSurface, null, null);
             } else {
